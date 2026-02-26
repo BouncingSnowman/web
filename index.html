@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BouncingSnowman — A creative portfolio showcasing design, code, and interactive experiences.">
+    <title>BouncingSnowman — Creative Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Snowflake particle canvas -->
+    <canvas id="snowCanvas"></canvas>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">
+                <span class="logo-icon">❄</span>
+                <span class="logo-text">BouncingSnowman</span>
+            </a>
+            <div class="nav-links">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#projects" class="nav-link">Projects</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">✦ Welcome to my space</div>
+            <h1 class="hero-title">
+                <span class="title-line">Crafting</span>
+                <span class="title-line gradient-text">Digital</span>
+                <span class="title-line">Experiences</span>
+            </h1>
+            <p class="hero-subtitle">
+                Designer, developer, and creative explorer — building interactive
+                experiences that blend aesthetics with technology.
+            </p>
+            <div class="hero-actions">
+                <a href="#projects" class="btn btn-primary">
+                    <span>View Projects</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+                <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag">01 — About</span>
+                <h2 class="section-title">A Passion for<br><span class="gradient-text">Creative Tech</span></h2>
+            </div>
+            <div class="about-grid">
+                <div class="about-card glass-card reveal">
+                    <div class="card-icon">🎨</div>
+                    <h3>Design</h3>
+                    <p>Creating visually striking interfaces that captivate users and elevate digital experiences beyond the ordinary.</p>
+                </div>
+                <div class="about-card glass-card reveal" style="animation-delay: 0.1s;">
+                    <div class="card-icon">⚡</div>
+                    <h3>Development</h3>
+                    <p>Building performant, accessible web applications with clean code and modern best practices.</p>
+                </div>
+                <div class="about-card glass-card reveal" style="animation-delay: 0.2s;">
+                    <div class="card-icon">🚀</div>
+                    <h3>Innovation</h3>
+                    <p>Exploring cutting-edge technologies and pushing boundaries to create unique interactive experiences.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag">02 — Projects</span>
+                <h2 class="section-title">Featured<br><span class="gradient-text">Work</span></h2>
+            </div>
+            <div class="projects-grid">
+                <div class="project-card glass-card reveal">
+                    <div class="project-preview" style="--accent: #6c5ce7;">
+                        <div class="project-mockup">
+                            <div class="mockup-bar">
+                                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                            </div>
+                            <div class="mockup-content">
+                                <div class="mock-header"></div>
+                                <div class="mock-grid">
+                                    <div class="mock-card"></div>
+                                    <div class="mock-card"></div>
+                                    <div class="mock-card"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <h3>Interactive Dashboard</h3>
+                        <p>A real-time analytics dashboard with dynamic data visualization and sleek dark-mode UI.</p>
+                        <div class="project-tags">
+                            <span class="tag">JavaScript</span>
+                            <span class="tag">Canvas API</span>
+                            <span class="tag">WebSockets</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card glass-card reveal" style="animation-delay: 0.1s;">
+                    <div class="project-preview" style="--accent: #00cec9;">
+                        <div class="project-mockup">
+                            <div class="mockup-bar">
+                                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                            </div>
+                            <div class="mockup-content">
+                                <div class="mock-hero-img"></div>
+                                <div class="mock-text-block"></div>
+                                <div class="mock-text-block short"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <h3>Creative Portfolio</h3>
+                        <p>A scroll-driven portfolio with parallax effects, particle animations, and micro-interactions.</p>
+                        <div class="project-tags">
+                            <span class="tag">HTML/CSS</span>
+                            <span class="tag">Animation</span>
+                            <span class="tag">GSAP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card glass-card reveal" style="animation-delay: 0.2s;">
+                    <div class="project-preview" style="--accent: #fd79a8;">
+                        <div class="project-mockup">
+                            <div class="mockup-bar">
+                                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                            </div>
+                            <div class="mockup-content">
+                                <div class="mock-chat">
+                                    <div class="mock-bubble left"></div>
+                                    <div class="mock-bubble right"></div>
+                                    <div class="mock-bubble left"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-info">
+                        <h3>AI Chat Interface</h3>
+                        <p>A modern conversational UI powered by AI, featuring streaming responses and rich media support.</p>
+                        <div class="project-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">OpenAI</span>
+                            <span class="tag">TypeScript</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag">03 — Skills</span>
+                <h2 class="section-title">Tools &<br><span class="gradient-text">Technologies</span></h2>
+            </div>
+            <div class="skills-grid">
+                <div class="skill-item glass-card reveal">
+                    <div class="skill-bar" style="--level: 95%; --hue: 260;">
+                        <div class="skill-fill"></div>
+                    </div>
+                    <span class="skill-name">JavaScript / TypeScript</span>
+                </div>
+                <div class="skill-item glass-card reveal" style="animation-delay: 0.05s;">
+                    <div class="skill-bar" style="--level: 90%; --hue: 200;">
+                        <div class="skill-fill"></div>
+                    </div>
+                    <span class="skill-name">HTML & CSS</span>
+                </div>
+                <div class="skill-item glass-card reveal" style="animation-delay: 0.1s;">
+                    <div class="skill-bar" style="--level: 88%; --hue: 320;">
+                        <div class="skill-fill"></div>
+                    </div>
+                    <span class="skill-name">React / Next.js</span>
+                </div>
+                <div class="skill-item glass-card reveal" style="animation-delay: 0.15s;">
+                    <div class="skill-bar" style="--level: 85%; --hue: 160;">
+                        <div class="skill-fill"></div>
+                    </div>
+                    <span class="skill-name">Node.js</span>
+                </div>
+                <div class="skill-item glass-card reveal" style="animation-delay: 0.2s;">
+                    <div class="skill-bar" style="--level: 80%; --hue: 30;">
+                        <div class="skill-fill"></div>
+                    </div>
+                    <span class="skill-name">Canvas / WebGL</span>
+                </div>
+                <div class="skill-item glass-card reveal" style="animation-delay: 0.25s;">
+                    <div class="skill-bar" style="--level: 82%; --hue: 50;">
+                        <div class="skill-fill"></div>
+                    </div>
+                    <span class="skill-name">UI / UX Design</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="contact-content reveal">
+                <span class="section-tag">04 — Contact</span>
+                <h2 class="section-title contact-title">Let's Build<br><span class="gradient-text">Something Great</span></h2>
+                <p class="contact-text">
+                    Have an idea, a project, or just want to say hello?
+                    I'm always open to interesting conversations and collaborations.
+                </p>
+                <a href="mailto:hello@example.com" class="btn btn-primary btn-large">
+                    <span>Say Hello</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="container footer-inner">
+            <span class="footer-logo">❄ BouncingSnowman</span>
+            <span class="footer-copy">© 2026 — All Rights Reserved</span>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
