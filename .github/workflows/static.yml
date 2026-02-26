@@ -3,7 +3,7 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ["cloud9"]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
