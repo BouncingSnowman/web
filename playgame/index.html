@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Alien Sector</title>
+
+    <link rel="manifest" href="manifest.webmanifest?v=6000">
+
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Alien Sector">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+    <link rel="stylesheet" href="css/style.css?v=6003">
+
+    <!-- CrazyGames SDK (required for Full Launch on CrazyGames) -->
+    <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+</head>
+
+<body>
+    <!-- Mobile/Tablet HUD (existing) -->
+    <div id="ui-layer">
+        <div class="hud-group">
+            <div class="hud-panel">
+                <div class="hud-text">SCORE</div>
+                <div class="hud-value" id="score-display">0</div>
+            </div>
+            <div class="hud-panel" id="bonus-panel">
+                <div class="hud-text" id="bonus-label">BONUS</div>
+                <div class="hud-value" id="bonus-display">x1.0</div>
+            </div>
+        </div>
+
+        <div class="hud-group">
+            <div class="hud-panel">
+                <div class="hud-text">SECTOR</div>
+                <div class="hud-value" id="level-display">1</div>
+            </div>
+            <div class="hud-panel highscore">
+                <div class="hud-text">BEST</div>
+                <div class="hud-value" id="highscore-display">0</div>
+            </div>
+            <div class="hud-panel">
+                <div class="hud-text">LIVES</div>
+                <div class="hud-value" id="lives-display">5</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop-only HUD (new style) -->
+    <div id="ui-layer-desktop" class="hud-bar" aria-hidden="true">
+        <div id="pause-btn-desktop" class="hud-pause" aria-label="Pause">||</div>
+
+        <div class="hud-cluster hud-left">
+            <div class="hud-pill hud-score" id="score-panel-desktop">
+                <div class="hud-label">SCORE</div>
+                <div class="hud-main" id="score-display-desktop">0</div>
+            </div>
+
+            <div class="hud-pill hud-bonus" id="bonus-panel-desktop">
+                <div class="hud-icon" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" class="hud-svg">
+                        <defs>
+                            <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#ffe28a" />
+                                <stop offset="1" stop-color="#c78a00" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M14 2h12l6 16-12 4L14 2z" fill="#2aa7ff" opacity="0.9" />
+                        <path d="M38 2h12l-6 20-12-4L38 2z" fill="#2aa7ff" opacity="0.9" />
+                        <circle cx="32" cy="36" r="16" fill="url(#gGold)" stroke="#5b3a00" stroke-width="2" />
+                        <path d="M32 24l3.3 7.2 7.9.7-6 5.2 1.8 7.7L32 41l-7 3.8 1.8-7.7-6-5.2 7.9-.7L32 24z"
+                            fill="#fff1b8" stroke="#7a4c00" stroke-width="1" />
+                    </svg>
+                </div>
+                <div class="hud-stack">
+                    <div class="hud-label">BONUS</div>
+                    <div class="hud-main hud-bonus-value" id="bonus-display-desktop">x1.0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hud-cluster hud-right">
+            <div class="hud-pill hud-level" id="level-panel-desktop">
+                <div class="hud-label">SECTOR</div>
+                <div class="hud-main" id="level-display-desktop">1</div>
+            </div>
+
+            <div class="hud-pill hud-best" id="best-panel-desktop">
+                <div class="hud-stack">
+                    <div class="hud-label">BEST</div>
+                    <div class="hud-main" id="highscore-display-desktop">0</div>
+                </div>
+                <div class="hud-icon" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" class="hud-svg">
+                        <defs>
+                            <linearGradient id="gCup" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#ffe28a" />
+                                <stop offset="1" stop-color="#c78a00" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M20 10h24v10c0 10-6 18-12 18S20 30 20 20V10z" fill="url(#gCup)" stroke="#5b3a00"
+                            stroke-width="2" />
+                        <path d="M14 14h6v8c0 6-3 10-8 10H8V18c0-2 2-4 6-4z" fill="#d59b11" stroke="#5b3a00"
+                            stroke-width="2" />
+                        <path d="M50 14h6c4 0 6 2 6 4v14h-4c-5 0-8-4-8-10v-8z" fill="#d59b11" stroke="#5b3a00"
+                            stroke-width="2" />
+                        <path d="M26 38h12v6H26v-6z" fill="#b07a00" />
+                        <path d="M22 44h20v6H22v-6z" fill="#8a5d00" />
+                        <path d="M18 50h28v6H18v-6z" fill="#5b3a00" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="hud-pill hud-lives" id="lives-panel-desktop">
+                <div class="hud-label">LIVES <span id="lives-display-desktop">5</span></div>
+                <div class="hud-hearts" id="lives-hearts-desktop" aria-hidden="true"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-viewport">
+        <canvas id="game-canvas"></canvas>
+        <div class="vignette"></div>
+
+        <!-- Achievement/Unlock toast -->
+        <div id="achievement-toast"
+            style="position:absolute; top:84px; left:50%; transform:translate(-50%, -10px); display:none; opacity:0; transition:all 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); z-index:100; padding:16px 24px; border-radius:16px; background:rgba(0,0,0,0.85); border:2px solid #ffd700; color:#ffffff; font-family:'Segoe UI', sans-serif; text-align:center; pointer-events:none; box-shadow: 0 0 30px rgba(255,215,0,0.3);">
+            <div
+                style="font-size:12px; color:#ffd700; font-weight:900; letter-spacing:2px; margin-bottom:4px; text-transform:uppercase;">
+                Achievement Unlocked</div>
+            <div id="achievement-text" style="font-size:18px; font-weight:700;">First Sector Cleared</div>
+        </div>
+
+        <!-- Multiplier feedback toast (shown briefly when multiplier drops) -->
+        <div id="multiplier-toast"
+            style="position:absolute; top:64px; left:50%; transform:translate(-50%, -6px) scale(0.98); display:none; opacity:0; transition:opacity 220ms ease, transform 220ms ease; z-index:60; padding:10px 14px; border-radius:12px; background:rgba(180,0,0,0.28); border:1px solid rgba(255,80,80,0.55); color:#ffffff; font-family:'Segoe UI', sans-serif; font-weight:900; letter-spacing:1.5px; text-transform:uppercase; text-shadow:0 0 10px rgba(0,0,0,0.85); pointer-events:none;">
+            MULTIPLIER DOWN</div>
+
+
+        <!-- Controls tutorial overlay (first play only). Tap anywhere to dismiss. -->
+        <div id="controls-tutorial" aria-hidden="true">
+            <div class="controls-tutorial-inner">
+                <div class="controls-tutorial-title">HOW TO PLAY</div>
+
+                <!-- Desktop controls - Show controls.png image -->
+                <div class="controls-desktop-section">
+                    <div class="controls-image-wrapper">
+                        <img src="assets/controls.png" alt="Use WASD or arrow keys to move, Spacebar to deploy shield"
+                            class="controls-hero-image">
+                    </div>
+                    <div class="controls-note">BLASTERS: AUTO-FIRE</div>
+                </div>
+
+                <!-- Mobile/Touch controls - Show joystick + shield images -->
+                <div class="controls-mobile-section">
+                    <div class="controls-row">
+                        <div class="controls-group">
+                            <div class="controls-shield-btn-visual">
+                                <span class="shield-count-visual">3</span>
+                            </div>
+                            <div class="key-label">TAP FOR SHIELD</div>
+                        </div>
+
+                        <div class="controls-group">
+                            <img src="assets/thumb.png" alt="Virtual joystick" class="controls-joystick-image">
+                            <div class="key-label">DRAG TO MOVE</div>
+                        </div>
+                    </div>
+
+                    <div class="controls-row">
+                        <div class="controls-group">
+                            <div class="key-label" style="color: #88ffff;">BLASTERS: AUTO-FIRE</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-tutorial-hint">TAP ANYWHERE TO START</div>
+            </div>
+        </div>
+
+
+
+        <!-- Launch cutscene (critical for unlocking audio on iPad) -->
+        <div id="launch-cutscene"
+            style="position:absolute; inset:0; z-index:100; background:#000; display:none; align-items:center; justify-content:center;">
+            <video id="launch-video" src="assets/launch.mp4" preload="auto" playsinline
+                style="width:100%; height:100%; object-fit:contain;"></video>
+        </div>
+
+        <div id="joystick-zone" class="mobile-control">
+            <div id="joystick-base">
+                <div id="joystick-stick"></div>
+            </div>
+        </div>
+        <div id="shield-btn" class="mobile-control">
+            <span id="shield-count-mobile">3</span>
+        </div>
+
+        <div id="pause-btn" class="mobile-control">||</div>
+        <div id="pause-overlay">
+            <div id="pause-text">PAUSED</div>
+            <div id="pause-difficulty"
+                style="font-family:'Segoe UI',sans-serif; font-weight:700; font-size:14px; letter-spacing:2px; color:#88ffff; margin-bottom:16px; text-transform:uppercase;">
+            </div>
+            <button id="resume-btn" class="pause-menu-btn">RESUME</button>
+            <button id="quit-btn" class="pause-menu-btn">QUIT TO MENU</button>
+        </div>
+
+
+
+        <!-- Controls instruction splash removed. Gameplay uses the in-game tutorial overlay instead. -->
+
+        <!-- Comeback Contract prompt (shown after a crash, once per sector) -->
+        <div id="comeback-contract-ui" aria-hidden="true"
+            style="position:absolute; inset:0; display:none; align-items:center; justify-content:center; z-index:80; pointer-events:auto;">
+            <div
+                style="min-width:280px; max-width:420px; margin:16px; padding:18px 18px 14px 18px; border-radius:16px; background:rgba(0,0,0,0.72); border:1px solid rgba(255,255,255,0.18); box-shadow:0 0 28px rgba(0,0,0,0.55); text-align:center;">
+                <div
+                    style="font-family:'Segoe UI', sans-serif; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:#ffd700; text-shadow:0 0 14px rgba(0,0,0,0.85);">
+                    COMEBACK CONTRACT</div>
+                <div id="comeback-contract-desc"
+                    style="margin-top:10px; font-family:'Segoe UI', sans-serif; font-weight:700; color:rgba(255,255,255,0.92); line-height:1.35;">
+                    Defeat 2 interceptors + 2 commando UFO. No points during contract.</div>
+                <div style="display:flex; gap:12px; justify-content:center; margin-top:14px;">
+                    <button id="comeback-accept-btn" type="button"
+                        style="padding:12px 18px; font-size:16px; font-weight:900; letter-spacing:1px; border-radius:12px; background:rgba(255,215,0,0.16); color:#ffd700; border:1px solid rgba(255,215,0,0.38); box-shadow:0 0 14px rgba(0,0,0,0.35);">ACCEPT</button>
+                    <button id="comeback-skip-btn" type="button"
+                        style="padding:12px 18px; font-size:16px; font-weight:900; letter-spacing:1px; border-radius:12px; background:rgba(255,255,255,0.10); color:#ffffff; border:1px solid rgba(255,255,255,0.22); box-shadow:0 0 14px rgba(0,0,0,0.35);">SKIP</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comeback Contract success (stays until you click return) -->
+        <div id="comeback-complete-ui" aria-hidden="true"
+            style="position:absolute; inset:0; display:none; align-items:center; justify-content:center; z-index:70; pointer-events:auto;">
+            <div
+                style="min-width:280px; max-width:420px; margin:16px; padding:18px 18px 14px 18px; border-radius:16px; background:rgba(0,0,0,0.72); border:1px solid rgba(255,255,255,0.18); box-shadow:0 0 28px rgba(0,0,0,0.55); text-align:center;">
+                <div
+                    style="font-family:'Segoe UI', sans-serif; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:#00ffcc; text-shadow:0 0 14px rgba(0,0,0,0.85);">
+                    CONTRACT COMPLETE</div>
+                <div
+                    style="margin-top:10px; font-family:'Segoe UI', sans-serif; font-weight:700; color:rgba(255,255,255,0.92); line-height:1.35;">
+                    Multiplier restored. Ready to return?</div>
+                <div style="display:flex; gap:12px; justify-content:center; margin-top:14px;">
+                    <button id="comeback-return-btn" type="button"
+                        style="padding:12px 18px; font-size:16px; font-weight:900; letter-spacing:1px; border-radius:12px; background:rgba(0,255,204,0.16); color:#00ffcc; border:1px solid rgba(0,255,204,0.38); box-shadow:0 0 14px rgba(0,0,0,0.35);">RETURN
+                        TO SECTOR</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="center-screen-overlay" class="menu-bg">
+
+            <div id="start-content">
+                <h1>Alien Sector</h1>
+
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <button id="start-btn">PLAY</button>
+                    <button id="hangar-btn">HANGAR</button>
+                    <button id="leaderboard-btn">SCORES</button>
+                </div>
+
+                <div id="menu-player-stats"
+                    style="display:none; margin: 14px auto 0 auto; padding: 8px 16px; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,215,0,0.25); border-radius: 8px; text-align: center; max-width: 340px; font-size: 13px; color: rgba(255,255,255,0.85); letter-spacing: 0.5px;">
+                </div>
+
+                <div id="menu-career-progress"
+                    style="display:none; margin: 14px auto 0 auto; padding: 10px 16px; background: rgba(0,0,0,0.45); border: 1px solid rgba(136,255,255,0.25); border-radius: 8px; text-align: center; max-width: 340px; font-size: 13px; color: rgba(255,255,255,0.85); letter-spacing: 0.5px;">
+                </div>
+
+                <div class="menu-difficulty-row"><br>
+                    <div class="splash-hint" style="margin-bottom: 6px;">CURRENT DIFFICULTY</div>
+                    <div id="menu-difficulty" class="diff-seg" role="radiogroup" aria-label="Difficulty">
+                        <button type="button" class="diff-seg-btn is-active" data-diff="EASY">EASY</button>
+                        <button type="button" class="diff-seg-btn" data-diff="NORMAL">NORMAL</button>
+                        <button type="button" class="diff-seg-btn" data-diff="HARD">HARD</button>
+                    </div>
+                </div>
+
+                <div class="controls-info" id="controls-text"
+                    style="color:#cfe6ff;text-shadow:0 0 8px #000; margin-top: 10px;">
+                    <p>Loading Controls...</p>
+                </div>
+
+                <div id="legal-links"
+                    style="margin-top: 18px; font-size: 12px; color: rgba(255,255,255,0.65); text-align: center; line-height: 1.4;">
+                    Online leaderboard: if you submit a score, your chosen name and score will be stored and displayed
+                    publicly.
+                    <a href="privacy.html" target="_blank" rel="noopener noreferrer"
+                        style="color: #88ffff; text-decoration: underline;">Privacy Policy</a>
+                </div>
+
+            </div>
+
+            <div id="leaderboard-view">
+                <h1 style="font-size: 40px; margin-bottom: 10px;">Scores</h1>
+                <div class="leaderboard-container">
+                    <div id="leaderboard-loading" class="loading-text">Loading scores...</div>
+                    <div id="leaderboard-entries" style="display:none;"></div>
+                </div>
+                <button id="leaderboard-back-btn" style="margin-top: 10px;">BACK</button>
+            </div>
+
+            <div id="hangar-view">
+                <h1 style="font-size: 40px; margin-bottom: 10px;">Hangar</h1>
+                <p class="hud-text"
+                    style="max-width: 640px; text-align: center; margin: 0 0 18px 0; color: rgba(255,255,255,0.75);">
+                    Standard is a heavy armored ship built to survive.
+                    Phoenix is a fast striker with stronger blaster output, but low health.
+                    Warlock is a fragile specialist that can mind-control UFOs.
+                    Ghost is a stealth assassin that cloaks and deploys holographic decoys.
+                </p>
+
+                <div class="hangar-container">
+                    <div class="ship-card" id="hangar-hero-card">
+                        <div class="ship-card-top">
+                            <div class="ship-card-title">STANDARD SHIP</div>
+                            <div class="ship-card-badge ship-card-badge-unlocked">OWNED</div>
+                        </div>
+                        <div class="ship-card-imgwrap">
+                            <img src="assets/ships/ship_hero1.png?v=6000" alt="Standard ship">
+                        </div>
+                        <div class="ship-card-desc">Heavy armor. Slow thrusters.</div>
+
+                        <div class="ship-card-stats" aria-label="Standard ship stats">
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">HEALTH</div>
+                                <div class="ship-stat-bar">
+                                    <div id="hero-health-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">SPEED</div>
+                                <div class="ship-stat-bar">
+                                    <div id="hero-speed-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">BLASTER</div>
+                                <div class="ship-stat-bar">
+                                    <div id="hero-blaster-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ship-traits" aria-label="Standard ship pros and cons">
+                            <span class="ship-trait ship-trait-pro">PRO: ARMOR</span>
+                            <span class="ship-trait ship-trait-pro">PRO: FORGIVING</span>
+                            <span class="ship-trait ship-trait-con">CON: SLOW</span>
+                        </div>
+                        <button id="hangar-hero-action" class="ship-action-btn" type="button">SELECT</button>
+                    </div>
+
+                    <div class="ship-card" id="hangar-winner-card">
+                        <div class="ship-card-top">
+                            <div class="ship-card-title">PHOENIX</div>
+                            <div id="hangar-winner-badge" class="ship-card-badge ship-card-badge-locked">0 / 15,000
+                            </div>
+                        </div>
+                        <div class="ship-card-imgwrap">
+                            <img src="assets/ships/winnership.png?v=6000" alt="Phoenix winner ship">
+                        </div>
+                        <div class="ship-card-desc">Fast striker. Stronger blaster. Low health.</div>
+
+                        <div class="ship-card-stats" aria-label="Phoenix ship stats">
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">HEALTH</div>
+                                <div class="ship-stat-bar">
+                                    <div id="phoenix-health-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">SPEED</div>
+                                <div class="ship-stat-bar">
+                                    <div id="phoenix-speed-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">BLASTER</div>
+                                <div class="ship-stat-bar">
+                                    <div id="phoenix-blaster-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ship-traits" aria-label="Phoenix pros and cons">
+                            <span class="ship-trait ship-trait-pro">PRO: SPEED</span>
+                            <span class="ship-trait ship-trait-pro">PRO: BLASTER</span>
+                            <span class="ship-trait ship-trait-con">CON: FRAGILE</span>
+                        </div>
+                        <button id="hangar-winner-action" class="ship-action-btn" type="button" disabled>LOCKED</button>
+                    </div>
+
+                    <div class="ship-card" id="hangar-warlock-card">
+                        <div class="ship-card-top">
+                            <div class="ship-card-title">WARLOCK</div>
+                            <div id="hangar-warlock-badge" class="ship-card-badge ship-card-badge-locked">0 / 100,000
+                            </div>
+                        </div>
+                        <div class="ship-card-imgwrap">
+                            <img src="assets/ships/mindship.png?v=6000" alt="Warlock mind control ship">
+                        </div>
+                        <div class="ship-card-desc">Mind control specialist. Fragile, but dangerous.</div>
+
+                        <div class="ship-card-stats" aria-label="Warlock ship stats">
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">HEALTH</div>
+                                <div class="ship-stat-bar">
+                                    <div id="warlock-health-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">SPEED</div>
+                                <div class="ship-stat-bar">
+                                    <div id="warlock-speed-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">BLASTER</div>
+                                <div class="ship-stat-bar">
+                                    <div id="warlock-blaster-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ship-traits" aria-label="Warlock pros and cons">
+                            <span class="ship-trait ship-trait-pro">PRO: MIND CONTROL</span>
+                            <span class="ship-trait ship-trait-pro">PRO: FAST</span>
+                            <span class="ship-trait ship-trait-con">CON: VERY LOW HP</span>
+                        </div>
+                        <button id="hangar-warlock-action" class="ship-action-btn" type="button"
+                            disabled>LOCKED</button>
+                    </div>
+
+                    <div class="ship-card" id="hangar-ghost-card">
+                        <div class="ship-card-top">
+                            <div class="ship-card-title">GHOST</div>
+                            <div id="hangar-ghost-badge" class="ship-card-badge ship-card-badge-locked">0 / 1,000,000
+                            </div>
+                        </div>
+                        <div class="ship-card-imgwrap">
+                            <img src="assets/ships/ghost.png?v=6000" alt="Ghost stealth ship">
+                        </div>
+                        <div class="ship-card-desc">Stealth assassin. Deploys holographic decoy and phases through
+                            matter.</div>
+
+                        <div class="ship-card-stats" aria-label="Ghost ship stats">
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">HEALTH</div>
+                                <div class="ship-stat-bar">
+                                    <div id="ghost-health-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">SPEED</div>
+                                <div class="ship-stat-bar">
+                                    <div id="ghost-speed-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                            <div class="ship-stat-row">
+                                <div class="ship-stat-label">BLASTER</div>
+                                <div class="ship-stat-bar">
+                                    <div id="ghost-blaster-bar" class="ship-stat-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ship-traits" aria-label="Ghost pros and cons">
+                            <span class="ship-trait ship-trait-pro">PRO: STEALTH</span>
+                            <span class="ship-trait ship-trait-pro">PRO: MIND CTRL</span>
+                            <span class="ship-trait ship-trait-con">CON: LOW HP</span>
+                        </div>
+                        <button id="hangar-ghost-action" class="ship-action-btn" type="button" disabled>LOCKED</button>
+                    </div>
+                </div>
+
+                <button id="hangar-back-btn" style="margin-top: 18px;">BACK</button>
+            </div>
+
+            <div id="game-over-content">
+                <h1>MISSION FAILED</h1>
+                <p>You were lost in deep space.</p>
+                <p class="hud-text" style="margin-top:10px;">FINAL SCORE: <span id="final-score"
+                        style="color:white;">0</span></p>
+                <p class="hud-text">REACHED SECTOR: <span id="final-level" style="color:white;">1</span></p>
+                <p id="gameover-personal-best"
+                    style="display:none; margin: 8px 0 0 0; font-weight: 900; letter-spacing: 0.5px; font-size: 15px;">
+                </p>
+                <p id="gameover-next-ship"
+                    style="display:none; margin: 10px 0 0 0; color: #88ffff; font-weight: 800; letter-spacing: 0.5px; font-size: 14px;">
+                </p>
+                <div id="high-score-input"
+                    style="display:none; flex-direction:column; align-items:center; margin:20px 0; animation:pulse-gold 2s infinite;">
+                    <p style="color:#ffd700; font-weight:bold; margin-bottom:10px;">NEW HIGH SCORE! ENTER YOUR NAME:</p>
+                    <p id="privacy-note-gameover"
+                        style="max-width: 360px; font-size: 12px; color: rgba(255,255,255,0.65); margin: 0 0 12px 0; text-align: center; line-height: 1.4;">
+                        Your name is optional. Submitting publishes your name and score on an online leaderboard.
+                        <a href="privacy.html" target="_blank" rel="noopener noreferrer"
+                            style="color: #88ffff; text-decoration: underline;">Privacy Policy</a>
+                    </p>
+                    <input type="text" id="player-name-input" maxlength="8" placeholder="name">
+                    <button id="submit-score-btn">SUBMIT</button>
+                    <button id="skip-score-btn"
+                        style="margin-top:10px; padding: 12px 40px; font-size: 16px; background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 0 14px rgba(0,0,0,0.35);">SKIP</button>
+                </div>
+                <div
+                    style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; max-width:480px; margin-left:auto; margin-right:auto;">
+                    <button id="restart-btn">TRY AGAIN</button>
+                    <button id="exit-btn">EXIT TO MENU</button>
+                    <button id="gameover-hangar-btn">HANGAR</button>
+                    <button id="gameover-leaderboard-btn">SCORES</button>
+                </div>
+            </div>
+
+            <div id="level-complete-content">
+                <h1 id="level-complete-title" style="font-size: 52px; margin-bottom: 10px;">SECTOR CLEARED</h1>
+                <h2 id="next-level-text">INITIATING WARP TO NEXT SECTOR</h2>
+                <p id="level-message" style="white-space: pre-line;">Systems Recharging... Shields Replenished.</p>
+                <p id="next-ship-unlock"
+                    style="margin: 10px 0 0 0; color: #88ffff; font-weight: 800; letter-spacing: 0.5px; display: none;">
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
+                    <button id="next-level-btn">NEXT SECTOR</button>
+                    <button id="sector-success-hangar-btn" class="game-btn"
+                        style="background: linear-gradient(180deg, #2a6080 0%, #1a4050 100%); border: 2px solid #88ffff; color: #88ffff; padding: 15px 30px; font-size: 18px; font-weight: bold; text-transform: uppercase; cursor: pointer; border-radius: 4px;">CHANGE
+                        SHIP</button>
+                    <button id="sector-success-leaderboard-btn">SCORES</button>
+                </div>
+
+                <!-- Bonus multiplier feedback (uses same medal-style graphic as the BONUS HUD) -->
+                <div id="level-complete-bonus-row" class="level-bonus-row" aria-hidden="true">
+                    <div class="level-bonus-pill">
+                        <div class="hud-icon" aria-hidden="true">
+                            <svg viewBox="0 0 64 64" class="hud-svg">
+                                <defs>
+                                    <linearGradient id="gGoldLC" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0" stop-color="#ffe28a" />
+                                        <stop offset="1" stop-color="#c78a00" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M14 2h12l6 16-12 4L14 2z" fill="#2aa7ff" opacity="0.9" />
+                                <path d="M38 2h12l-6 20-12-4L38 2z" fill="#2aa7ff" opacity="0.9" />
+                                <circle cx="32" cy="36" r="16" fill="url(#gGoldLC)" stroke="#5b3a00" stroke-width="2" />
+                                <path d="M32 24l3.3 7.2 7.9.7-6 5.2 1.8 7.7L32 41l-7 3.8 1.8-7.7-6-5.2 7.9-.7L32 24z"
+                                    fill="#fff1b8" stroke="#7a4c00" stroke-width="1" />
+                            </svg>
+                        </div>
+                        <div class="level-bonus-stack">
+                            <div class="level-bonus-label">BONUS MULTIPLIER</div>
+                            <div class="level-bonus-value" id="level-complete-multiplier">x1.0</div>
+                            <div class="level-bonus-note" id="level-complete-multiplier-note"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="victory-stats-content"
+                style="display:none; flex-direction:column; align-items:center; text-align:center;">
+                <h1
+                    style="font-size: 52px; color: #ffd700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); margin-bottom: 20px;">
+                    MISSION DATA</h1>
+                <div
+                    style="background: rgba(0,0,0,0.6); padding: 30px; border-radius: 15px; border: 1px solid #ffd700; min-width: 300px;">
+                    <div style="display: flex; justify-content: space-between; margin: 15px 0; font-size: 24px;">
+                        <span style="color: #88aaff;">REMAINING LIVES:</span>
+                        <span id="stat-lives" style="color: #fff; font-weight: bold;">0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 15px 0; font-size: 24px;">
+                        <span style="color: #44ff44;">SURVIVAL BONUS:</span>
+                        <span id="stat-bonus" style="color: #44ff44; font-weight: bold;">+0</span>
+                    </div>
+                    <div style="height: 2px; background: #333; margin: 20px 0;"></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 28px; font-weight: bold;">
+                        <span style="color: #ffd700;">TOTAL SCORE:</span>
+                        <span id="stat-total" style="color: #fff;">0</span>
+                    </div>
+                </div>
+                <p id="victory-next-ship"
+                    style="display:none; margin: 10px 0 0 0; color: #88ffff; font-weight: 800; letter-spacing: 0.5px; font-size: 14px;">
+                </p>
+                <p style="margin-top: 30px; color: rgba(255,255,255,0.6); font-style: italic;">Docking procedures
+                    complete. Ready for debriefing.</p>
+                <button id="stats-continue-btn" class="menu-btn" style="margin-top: 20px;">RECEIVE ACCOLADES</button>
+            </div>
+
+            <div id="game-complete-content">
+                <h1 style="font-size: 60px; color: #44ff44; text-shadow: 0 0 30px #00ff00;">WELCOME HOME</h1>
+                <h2 style="color: #88ffff;">MISSION ACCOMPLISHED</h2>
+                <div
+                    style="background: rgba(0,0,0,0.5); padding: 20px 40px; border-radius: 10px; border: 1px solid #333; margin-top: 20px;">
+                    <p>You have safely returned to Earth.</p>
+                    <p class="hud-text" style="margin: 10px 0;">FINAL SCORE: <span id="victory-score"
+                            style="color: white;">0</span></p>
+                </div>
+                <div id="high-score-input-victory"
+                    style="display:none; flex-direction:column; align-items: center; margin: 20px 0; animation: pulse-gold 2s infinite;">
+                    <p style="color: #ffd700; font-weight: bold; margin-bottom: 10px;">LEGENDARY SCORE!</p>
+                    <p id="privacy-note-victory"
+                        style="max-width: 360px; font-size: 12px; color: rgba(255,255,255,0.65); margin: 0 0 12px 0; text-align: center; line-height: 1.4;">
+                        Your name is optional. Submitting publishes your name and score on an online leaderboard.
+                        <a href="privacy.html" target="_blank" rel="noopener noreferrer"
+                            style="color: #88ffff; text-decoration: underline;">Privacy Policy</a>
+                    </p>
+                    <input type="text" id="player-name-input-victory" maxlength="8" placeholder="name"
+                        style="background: rgba(0, 0, 0, 0.8); border: 2px solid #ffd700; color: #ffd700; padding: 10px 20px; font-size: 24px; text-align: center; text-transform: uppercase; border-radius: 4px; width: 150px; outline: none; margin-bottom: 10px;">
+                    <button id="submit-score-btn-victory"
+                        style="background: linear-gradient(45deg, #aa8800, #ffdd00); color: #000; border: none; padding: 10px 30px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 4px; font-size: 16px;">SUBMIT</button>
+                    <button id="skip-score-btn-victory"
+                        style="margin-top:10px; background: rgba(255,255,255,0.14); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 10px 30px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 4px; font-size: 16px; box-shadow: 0 0 14px rgba(0,0,0,0.35);">SKIP</button>
+                </div>
+                <div
+                    style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; max-width:480px; margin-left:auto; margin-right:auto;">
+                    <button id="victory-restart-btn">PLAY AGAIN</button>
+                    <button id="victory-hangar-btn">HANGAR</button>
+                    <button id="victory-leaderboard-btn">SCORES</button>
+                    <button id="victory-exit-btn">EXIT TO MENU</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script type="module" src="src/main.js?v=6004"></script>
+</body>
+
+</html>

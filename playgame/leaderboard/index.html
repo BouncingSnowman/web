@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alien Sector Invasion | Global Leaderboard</title>
+
+    <style>
+        :root {
+            --bg: #060910;
+            --panel: rgba(10, 18, 35, 0.72);
+            --panel2: rgba(0, 0, 0, 0.35);
+            --text: #eaf2ff;
+            --muted: rgba(234, 242, 255, 0.75);
+            --line: rgba(255, 255, 255, 0.12);
+            --cyan: #00ffff;
+            --blue: #88aaff;
+            --red: #ff5555;
+            --green: #44ff44;
+            --good: #7CFF83;
+            --warn: #ffd36e;
+            --bad: #ff6b6b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        a {
+            color: var(--cyan);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Background image layer */
+        .bg {
+            position: fixed;
+            inset: 0;
+            background: url("websitebackground.png") left center / cover no-repeat;
+            z-index: 0;
+        }
+
+        /* Readability shading layer */
+        .shade {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background:
+                radial-gradient(1000px 700px at 60% 10%, rgba(0, 255, 255, 0.06), transparent 55%),
+                radial-gradient(900px 600px at 90% 25%, rgba(136, 170, 255, 0.08), transparent 55%),
+                linear-gradient(90deg,
+                    rgba(0, 0, 0, 0.00) 0%,
+                    rgba(0, 0, 0, 0.20) 42%,
+                    rgba(0, 0, 0, 0.60) 64%,
+                    rgba(0, 0, 0, 0.72) 100%);
+        }
+
+        /* Foreground content layer */
+        .wrap {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 16px 56px 16px;
+        }
+
+        /* Push leaderboard rail to the right so the character stays visible on the left */
+        .rail {
+            width: min(720px, 100%);
+            margin-left: auto;
+        }
+
+        .hero {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding: 18px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            background: rgba(10, 18, 35, 0.62);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(10px);
+        }
+
+        .titleblock {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 260px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 34px;
+            letter-spacing: 0.5px;
+            font-weight: 900;
+            line-height: 1.08;
+            text-shadow: 0 0 18px rgba(0, 0, 0, 0.55);
+        }
+
+        .subtitle {
+            color: rgba(234, 242, 255, 0.78);
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 560px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(0, 0, 0, 0.35);
+            color: rgba(234, 242, 255, 0.82);
+            font-size: 12px;
+            user-select: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            appearance: none;
+            border: 1px solid rgba(0, 255, 255, 0.28);
+            background: rgba(0, 0, 0, 0.38);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-weight: 900;
+            letter-spacing: 0.6px;
+            cursor: pointer;
+            transition: transform 0.06s ease, background 0.12s ease, border-color 0.12s ease;
+            user-select: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(0, 0, 0, 0.48);
+            border-color: rgba(0, 255, 255, 0.44);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn.secondary {
+            border-color: rgba(255, 255, 255, 0.14);
+            background: rgba(0, 0, 0, 0.30);
+        }
+
+        .btn.secondary:hover {
+            background: rgba(0, 0, 0, 0.40);
+            border-color: rgba(255, 255, 255, 0.22);
+        }
+
+        .grid {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .panel {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            background: rgba(10, 18, 35, 0.62);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .panelheader {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 16px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), transparent);
+        }
+
+        .paneltitle {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .paneltitle h2 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.35);
+            font-weight: 900;
+        }
+
+        .paneltitle .meta {
+            font-size: 13px;
+            color: rgba(234, 242, 255, 0.75);
+        }
+
+        .modebadge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 98px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.35);
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            backdrop-filter: blur(10px);
+        }
+
+        .modebadge.easy {
+            color: var(--green);
+        }
+
+        .modebadge.normal {
+            color: var(--blue);
+        }
+
+        .modebadge.hard {
+            color: var(--red);
+        }
+
+        .tablewrap {
+            overflow-x: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        thead th {
+            text-align: left;
+            font-size: 12px;
+            color: rgba(234, 242, 255, 0.8);
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.22);
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 15px;
+        }
+
+        tbody tr:hover {
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .rank {
+            width: 70px;
+            color: rgba(234, 242, 255, 0.9);
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        /* FIX: pixel width + no extra letter spacing so 8 chars fit everywhere */
+        th.name,
+        td.name {
+            width: 150px;
+            max-width: 150px;
+            min-width: 150px;
+            padding-right: 10px;
+        }
+
+        td.name,
+        th.name {
+            letter-spacing: 0px;
+        }
+
+        .name {
+            font-weight: 900;
+            text-transform: uppercase;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Spacer column: absorbs remaining width, visually empty */
+        th.spacer,
+        td.spacer {
+            padding: 0;
+        }
+
+        .score {
+            width: 140px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-weight: 900;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
+        }
+
+        .footer {
+            margin-top: 18px;
+            font-size: 12px;
+            color: rgba(234, 242, 255, 0.75);
+            line-height: 1.5;
+            text-align: center;
+            padding: 0 8px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(0, 0, 0, 0.30);
+            border-radius: 14px;
+            margin-top: 14px;
+            color: rgba(234, 242, 255, 0.82);
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--warn);
+            box-shadow: 0 0 12px rgba(255, 211, 110, 0.55);
+            flex: 0 0 auto;
+        }
+
+        .dot.ok {
+            background: var(--good);
+            box-shadow: 0 0 12px rgba(124, 255, 131, 0.55);
+        }
+
+        .dot.bad {
+            background: var(--bad);
+            box-shadow: 0 0 12px rgba(255, 107, 107, 0.55);
+        }
+
+        .note {
+            margin-top: 10px;
+            font-size: 12px;
+            color: rgba(234, 242, 255, 0.7);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 940px) {
+            .rail {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .shade {
+                background:
+                    radial-gradient(1000px 700px at 60% 10%, rgba(0, 255, 255, 0.05), transparent 55%),
+                    radial-gradient(900px 600px at 90% 25%, rgba(136, 170, 255, 0.06), transparent 55%),
+                    linear-gradient(180deg,
+                        rgba(0, 0, 0, 0.25) 0%,
+                        rgba(0, 0, 0, 0.62) 35%,
+                        rgba(0, 0, 0, 0.74) 100%);
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .hero {
+                padding: 14px 14px;
+            }
+
+            thead th,
+            tbody td {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .rank {
+                width: 56px;
+            }
+
+            .score {
+                width: 112px;
+            }
+
+            thead th {
+                font-size: 11px;
+            }
+
+            tbody td {
+                font-size: 14px;
+            }
+
+            th.name,
+            td.name {
+                width: 120px;
+                max-width: 120px;
+                min-width: 120px;
+                padding-right: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg" aria-hidden="true"></div>
+    <div class="shade" aria-hidden="true"></div>
+
+    <div class="wrap">
+        <div class="rail">
+            <div class="hero">
+                <div class="titleblock">
+                    <h1>Alien Sector Invasion | Global Leaderboard</h1>
+                    <div class="subtitle">
+                        Live scores pulled directly from the same global leaderboard backend your game uses.
+                        Easy first, then Normal, then Hard.
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="pill">
+                        <span>Auto refresh:</span>
+                        <strong id="autoRefreshLabel">ON</strong>
+                    </div>
+                    <button class="btn secondary" id="toggleAutoBtn" type="button">Toggle</button>
+                    <button class="btn" id="refreshBtn" type="button">Refresh now</button>
+                </div>
+            </div>
+
+            <div class="status" id="statusBar" aria-live="polite">
+                <span class="dot" id="statusDot"></span>
+                <span id="statusText">Ready.</span>
+            </div>
+
+            <div class="grid">
+                <section class="panel" aria-label="Easy leaderboard">
+                    <div class="panelheader">
+                        <div class="paneltitle">
+                            <h2>Easy</h2>
+                            <div class="meta">Top 60 global scores</div>
+                        </div>
+                        <div class="modebadge easy">EASY</div>
+                    </div>
+                    <div class="tablewrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="rank">Rank</th>
+                                    <th class="name">Name</th>
+                                    <th class="spacer"></th>
+                                    <th class="score">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="easyBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="panel" aria-label="Normal leaderboard">
+                    <div class="panelheader">
+                        <div class="paneltitle">
+                            <h2>Normal</h2>
+                            <div class="meta">Top 60 global scores</div>
+                        </div>
+                        <div class="modebadge normal">NORMAL</div>
+                    </div>
+                    <div class="tablewrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="rank">Rank</th>
+                                    <th class="name">Name</th>
+                                    <th class="spacer"></th>
+                                    <th class="score">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="normalBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="panel" aria-label="Hard leaderboard">
+                    <div class="panelheader">
+                        <div class="paneltitle">
+                            <h2>Hard</h2>
+                            <div class="meta">Top 60 global scores</div>
+                        </div>
+                        <div class="modebadge hard">HARD</div>
+                    </div>
+                    <div class="tablewrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="rank">Rank</th>
+                                    <th class="name">Name</th>
+                                    <th class="spacer"></th>
+                                    <th class="score">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hardBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div class="footer">
+                <div id="lastUpdated">Last updated: never</div>
+                <div class="note">2026</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FUNCTIONS_BASE = 'https://cywcnyimlhiwbbqqzvoe.supabase.co/functions/v1';
+
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5d2NueWltbGhpd2JicXF6dm9lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NjIyOTYsImV4cCI6MjA4MTEzODI5Nn0.rVPlSGwbKz-HyODCz3f2tFW-9sm1X3zRVuWoDuwsM24';
+
+        const LIMIT_PER_MODE = 60;
+        const AUTO_REFRESH_MS = 60_000;
+
+        const elEasyBody = document.getElementById('easyBody');
+        const elNormalBody = document.getElementById('normalBody');
+        const elHardBody = document.getElementById('hardBody');
+        const elLastUpdated = document.getElementById('lastUpdated');
+
+        const elStatusDot = document.getElementById('statusDot');
+        const elStatusText = document.getElementById('statusText');
+
+        const elRefreshBtn = document.getElementById('refreshBtn');
+        const elToggleAutoBtn = document.getElementById('toggleAutoBtn');
+        const elAutoRefreshLabel = document.getElementById('autoRefreshLabel');
+
+        let autoRefresh = true;
+        let timer = null;
+
+        function normalizeDifficulty(difficulty) {
+            const d = String(difficulty || 'NORMAL').toUpperCase();
+            if (d === 'HARD') return 'HARD';
+            if (d === 'EASY') return 'EASY';
+            return 'NORMAL';
+        }
+
+        function normalizeScores(payload) {
+            const arr = Array.isArray(payload)
+                ? payload
+                : (payload && Array.isArray(payload.data)
+                    ? payload.data
+                    : (payload && Array.isArray(payload.scores)
+                        ? payload.scores
+                        : []));
+
+            return arr.map((s) => ({
+                name: (s && s.name ? String(s.name) : 'Pilot').slice(0, 8),
+                score: Math.floor(Number(s && s.score ? s.score : 0)),
+                difficulty: normalizeDifficulty(s && s.difficulty),
+            }));
+        }
+
+        function addAnonAuthHeaders(options) {
+            if (!SUPABASE_ANON_KEY) return options;
+            const base = options || {};
+            const h = { ...(base.headers || {}) };
+            if (!h.Authorization) h.Authorization = `Bearer ${SUPABASE_ANON_KEY}`;
+            if (!h.apikey) h.apikey = SUPABASE_ANON_KEY;
+            return { ...base, headers: h };
+        }
+
+        async function fetchJson(url, options, didAuthRetry) {
+            const res = await fetch(url, options);
+            const text = await res.text();
+            let json = null;
+            try { json = text ? JSON.parse(text) : null; } catch { /* ignore */ }
+
+            if (!res.ok) {
+                const msg = (json && (json.error || json.message)) ? (json.error || json.message) : `HTTP ${res.status}`;
+                const isAuth = (res.status === 401 || res.status === 403);
+                if (!didAuthRetry && SUPABASE_ANON_KEY && isAuth) {
+                    return fetchJson(url, addAnonAuthHeaders(options), true);
+                }
+                throw new Error(msg);
+            }
+            return json;
+        }
+
+        async function fetchTopScores(difficulty, limit) {
+            const d = normalizeDifficulty(difficulty);
+            const cleanLimit = Math.max(1, Math.floor(Number(limit) || 10));
+
+            const requestLimit = Math.min(200, cleanLimit * 3);
+
+            const url = `${FUNCTIONS_BASE}/get-scores?difficulty=${encodeURIComponent(d)}&limit=${encodeURIComponent(String(requestLimit))}&_=${Date.now()}`;
+            const json = await fetchJson(url, { method: 'GET', cache: 'no-store' }, false);
+
+            const normalized = normalizeScores(json)
+                .filter((s) => s.difficulty === d)
+                .sort((a, b) => (b.score - a.score));
+
+            const seen = new Set();
+            const unique = [];
+            for (const s of normalized) {
+                const key = `${s.difficulty}|${String(s.name || '').toUpperCase()}|${Math.floor(Number(s.score || 0))}`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                unique.push(s);
+                if (unique.length >= cleanLimit) break;
+            }
+
+            return unique;
+        }
+
+        function toRowHtml(entry, idx) {
+            const name = String(entry.name || 'Pilot').trim().slice(0, 8).toUpperCase() || 'PILOT';
+            const score = Math.floor(Number(entry.score || 0));
+
+            const safeName = name.replace(/[&<>"']/g, (c) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[c]));
+
+            return `
+        <tr>
+          <td class="rank">${idx + 1}</td>
+          <td class="name" title="${safeName}">${safeName}</td>
+          <td class="spacer"></td>
+          <td class="score">${score.toLocaleString('en-US')}</td>
+        </tr>`;
+        }
+
+        function renderTable(bodyEl, rows) {
+            if (!bodyEl) return;
+            if (!rows || rows.length === 0) {
+                bodyEl.innerHTML = `
+          <tr>
+            <td colspan="4" style="padding:14px 16px;color:rgba(234,242,255,0.75);">No scores yet.</td>
+          </tr>`;
+                return;
+            }
+            bodyEl.innerHTML = rows.map(toRowHtml).join('');
+        }
+
+        function setStatus(type, text) {
+            if (!elStatusDot || !elStatusText) return;
+            elStatusDot.classList.remove('ok', 'bad');
+            if (type === 'ok') elStatusDot.classList.add('ok');
+            if (type === 'bad') elStatusDot.classList.add('bad');
+            elStatusText.textContent = text;
+        }
+
+        function setAutoRefresh(on) {
+            autoRefresh = !!on;
+            elAutoRefreshLabel.textContent = autoRefresh ? 'ON' : 'OFF';
+
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+            if (autoRefresh) {
+                timer = setInterval(() => {
+                    refresh().catch(() => { });
+                }, AUTO_REFRESH_MS);
+            }
+        }
+
+        async function refresh() {
+            setStatus('warn', 'Loading latest scores...');
+
+            try {
+                const [easy, normal, hard] = await Promise.all([
+                    fetchTopScores('EASY', LIMIT_PER_MODE),
+                    fetchTopScores('NORMAL', LIMIT_PER_MODE),
+                    fetchTopScores('HARD', LIMIT_PER_MODE)
+                ]);
+
+                renderTable(elEasyBody, easy);
+                renderTable(elNormalBody, normal);
+                renderTable(elHardBody, hard);
+
+                const now = new Date();
+                elLastUpdated.textContent = `Last updated: ${now.toLocaleString()}`;
+
+                const e0 = easy && easy[0] ? easy[0].score : 0;
+                const n0 = normal && normal[0] ? normal[0].score : 0;
+                const h0 = hard && hard[0] ? hard[0].score : 0;
+                setStatus('ok', `Loaded. Best Easy: ${Number(e0 || 0).toLocaleString('en-US')}, Best Normal: ${Number(n0 || 0).toLocaleString('en-US')}, Best Hard: ${Number(h0 || 0).toLocaleString('en-US')}.`);
+            } catch (err) {
+                console.error(err);
+                setStatus('bad', `Failed to load leaderboard: ${String(err && err.message ? err.message : err)}`);
+
+                renderTable(elEasyBody, []);
+                renderTable(elNormalBody, []);
+                renderTable(elHardBody, []);
+            }
+        }
+
+        elRefreshBtn.addEventListener('click', () => { refresh(); });
+        elToggleAutoBtn.addEventListener('click', () => { setAutoRefresh(!autoRefresh); });
+
+        setAutoRefresh(true);
+        refresh();
+    </script>
+</body>
+
+</html>
