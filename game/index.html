@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alien Sector — Space Shooter Game</title>
+    <meta name="description"
+        content="Pilot your interceptor through asteroid fields, battle alien UFOs, and defend humanity in the ultimate space shooter. Play free in your browser.">
+    <meta name="theme-color" content="#060a14">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://aliensector.com/icons/icon-192.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #060a14;
+            --bg-card: rgba(8, 16, 32, 0.75);
+            --cyan: #00e5ff;
+            --cyan-dim: rgba(0, 229, 255, 0.12);
+            --cyan-glow: rgba(0, 229, 255, 0.35);
+            --orange: #ff8c00;
+            --orange-dim: rgba(255, 140, 0, 0.12);
+            --green: #00ff88;
+            --green-dim: rgba(0, 255, 136, 0.12);
+            --gold: #ffd700;
+            --text: #e0e8ff;
+            --text-dim: rgba(200, 220, 255, 0.55);
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============================================================
+           ANIMATED STAR BACKGROUND (canvas)
+           ============================================================ */
+        #star-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           NAVIGATION
+           ============================================================ */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 40px;
+            background: rgba(6, 10, 20, 0.75);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.08);
+            transition: background 0.3s;
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 18px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--cyan), #4488ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--cyan);
+        }
+
+        .nav-play-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: var(--cyan);
+            color: #000;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        .nav-play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 36px var(--cyan-glow), 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ============================================================
+           HERO SECTION
+           ============================================================ */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: url('assets/hero_bg.png') center center / cover no-repeat;
+        }
+
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(6, 10, 20, 0.35) 0%,
+                    rgba(6, 10, 20, 0.55) 50%,
+                    var(--bg) 100%);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            animation: fadeUp 1.2s ease-out;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border: 1px solid var(--cyan-dim);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 24px;
+            background: rgba(0, 229, 255, 0.06);
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: clamp(42px, 8vw, 80px);
+            line-height: 1.05;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff 20%, var(--cyan) 80%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            filter: drop-shadow(0 0 30px var(--cyan-glow));
+        }
+
+        .hero-desc {
+            font-size: clamp(16px, 2.2vw, 20px);
+            color: rgba(200, 220, 255, 0.75);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            background: var(--cyan);
+            color: #000;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 30px var(--cyan-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 50px var(--cyan-glow), 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: transparent;
+            color: var(--cyan);
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--cyan);
+            background: rgba(0, 229, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .btn-gold {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #c78a00, #ffd700);
+            color: #000;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dim);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .scroll-hint svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--text-dim);
+        }
+
+        /* ============================================================
+           SECTION COMMON
+           ============================================================ */
+        section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 24px;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: clamp(28px, 4vw, 42px);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff, var(--cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+
+        /* ============================================================
+           FEATURES SECTION
+           ============================================================ */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            padding: 32px;
+            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-card.cyan:hover {
+            border-color: var(--cyan-glow);
+            box-shadow: 0 0 30px var(--cyan-dim);
+        }
+
+        .feature-card.orange:hover {
+            border-color: rgba(255, 140, 0, 0.35);
+            box-shadow: 0 0 30px var(--orange-dim);
+        }
+
+        .feature-card.green:hover {
+            border-color: rgba(0, 255, 136, 0.35);
+            box-shadow: 0 0 30px var(--green-dim);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .feature-icon.cyan {
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            box-shadow: 0 0 16px var(--cyan-dim);
+        }
+
+        .feature-icon.orange {
+            background: var(--orange-dim);
+            color: var(--orange);
+            box-shadow: 0 0 16px var(--orange-dim);
+        }
+
+        .feature-icon.green {
+            background: var(--green-dim);
+            color: var(--green);
+            box-shadow: 0 0 16px var(--green-dim);
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        /* ============================================================
+           SHIPS SECTION
+           ============================================================ */
+        .ships-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .ship-card {
+            padding: 32px 24px;
+            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .ship-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--cyan-glow);
+            box-shadow: 0 0 40px var(--cyan-dim), 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .ship-card img {
+            width: 96px;
+            height: 96px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px var(--cyan-glow));
+            transition: transform 0.3s;
+        }
+
+        .ship-card:hover img {
+            transform: scale(1.15) rotate(-5deg);
+        }
+
+        .ship-card h3 {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 18px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .ship-card .ship-role {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 12px;
+        }
+
+        .ship-card p {
+            color: var(--text-dim);
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .ship-stats {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .ship-tag {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .ship-tag.pro {
+            background: rgba(0, 255, 136, 0.12);
+            color: var(--green);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .ship-tag.con {
+            background: rgba(255, 80, 80, 0.12);
+            color: #ff5555;
+            border: 1px solid rgba(255, 80, 80, 0.2);
+        }
+
+        /* ============================================================
+           CTA SECTION
+           ============================================================ */
+        .cta-section {
+            text-align: center;
+            padding: 120px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--cyan-dim) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .cta-section h2 {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: clamp(32px, 5vw, 52px);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--gold) 0%, #ff8c00 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta-section p {
+            color: var(--text-dim);
+            font-size: 18px;
+            margin-bottom: 40px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        .footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: var(--cyan);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ============================================================
+           ANIMATIONS
+           ============================================================ */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(8px);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        /* Intersection Observer fade-in */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 12px 20px;
+            }
+
+            .nav-links {
+                gap: 16px;
+            }
+
+            .nav-links a {
+                display: none;
+            }
+
+            .hero {
+                padding: 100px 16px 60px;
+                min-height: 90vh;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-primary,
+            .btn-secondary,
+            .btn-gold {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+
+            section {
+                padding: 60px 16px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ships-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .ships-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated star field -->
+    <canvas id="star-canvas"></canvas>
+
+    <!-- NAVIGATION -->
+    <nav class="nav" id="nav">
+        <a href="#" class="nav-logo">Alien Sector</a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#ships">Ships</a>
+            <a href="https://aliensector.com/leaderboard/" target="_blank">Leaderboard</a>
+            <a href="https://aliensector.com/" class="nav-play-btn">▶ Play Now</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-badge">🚀 Free Browser Game</div>
+            <h1>Alien Sector</h1>
+            <p class="hero-desc">
+                Pilot your interceptor through asteroid fields, battle alien UFOs,
+                and defend humanity across 10 deadly sectors in the ultimate space shooter.
+            </p>
+            <div class="hero-buttons">
+                <a href="https://aliensector.com/" class="btn-primary">▶ Play Now</a>
+                <a href="#features" class="btn-secondary">Learn More</a>
+                <a href="https://aliensector.com/leaderboard/" class="btn-gold" target="_blank">🏆 Leaderboard</a>
+            </div>
+        </div>
+        <div class="scroll-hint">
+            <span>Scroll</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                <polyline points="6 9 12 15 18 9" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section id="features">
+        <h2 class="section-title reveal">Game Features</h2>
+        <p class="section-subtitle reveal">Navigate asteroid fields, outmaneuver alien squadrons, and unlock powerful
+            ships on your journey home.</p>
+
+        <div class="features-grid">
+            <div class="feature-card cyan reveal">
+                <div class="feature-icon cyan">🚀</div>
+                <h3>4 Unique Ships</h3>
+                <p>From the armored Standard to the stealthy Ghost, each ship offers a completely different playstyle
+                    with unique abilities.</p>
+            </div>
+            <div class="feature-card orange reveal">
+                <div class="feature-icon orange">☄️</div>
+                <h3>Asteroid Fields</h3>
+                <p>Navigate through procedurally generated asteroid fields that grow more treacherous with every sector
+                    you clear.</p>
+            </div>
+            <div class="feature-card cyan reveal">
+                <div class="feature-icon cyan">👾</div>
+                <h3>Alien Combat</h3>
+                <p>Battle UFO squadrons, sniper variants, commando units, and devastating boss encounters across 10
+                    sectors.</p>
+            </div>
+            <div class="feature-card green reveal">
+                <div class="feature-icon green">🛡️</div>
+                <h3>Shields & Powerups</h3>
+                <p>Deploy shields for protection, collect rapid fire upgrades, repair kits, and extra lives to survive
+                    the journey.</p>
+            </div>
+            <div class="feature-card orange reveal">
+                <div class="feature-icon orange">🌟</div>
+                <h3>Golden Asteroids</h3>
+                <p>Hunt down rare golden asteroids for bonus score and powerup drops. Risk vs. reward in every
+                    encounter.</p>
+            </div>
+            <div class="feature-card green reveal">
+                <div class="feature-icon green">🧠</div>
+                <h3>Mind Control</h3>
+                <p>Unlock the Warlock or Ghost and turn enemy UFOs into allies. Captured enemies fight and score points
+                    for you.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SHIPS SECTION -->
+    <section id="ships" style="background: rgba(0,0,0,0.3);">
+        <h2 class="section-title reveal">Choose Your Ship</h2>
+        <p class="section-subtitle reveal">Unlock new ships by building your career score. Each ship demands a different
+            strategy.</p>
+
+        <div class="ships-grid">
+            <div class="ship-card reveal">
+                <img src="assets/ships/ship_hero1.png" alt="Standard Ship">
+                <h3>Standard</h3>
+                <div class="ship-role">Heavy Interceptor</div>
+                <p>Heavy armor and forgiving gameplay. The perfect ship for learning the ropes of deep space combat.</p>
+                <div class="ship-stats">
+                    <span class="ship-tag pro">Armor</span>
+                    <span class="ship-tag pro">Forgiving</span>
+                    <span class="ship-tag con">Slow</span>
+                </div>
+            </div>
+
+            <div class="ship-card reveal">
+                <img src="assets/ships/winnership.png" alt="Phoenix Ship">
+                <h3>Phoenix</h3>
+                <div class="ship-role">Fast Striker</div>
+                <p>Blazing speed and enhanced blasters, but paper-thin hull. For pilots who rely on reflexes over armor.
+                </p>
+                <div class="ship-stats">
+                    <span class="ship-tag pro">Speed</span>
+                    <span class="ship-tag pro">Blaster</span>
+                    <span class="ship-tag con">Fragile</span>
+                </div>
+            </div>
+
+            <div class="ship-card reveal">
+                <img src="assets/ships/mindship.png" alt="Warlock Ship">
+                <h3>Warlock</h3>
+                <div class="ship-role">Mind Controller</div>
+                <p>Turn enemies into allies with the mind control ring. A unique playstyle that rewards patience.</p>
+                <div class="ship-stats">
+                    <span class="ship-tag pro">Mind Control</span>
+                    <span class="ship-tag pro">Fast</span>
+                    <span class="ship-tag con">Low HP</span>
+                </div>
+            </div>
+
+            <div class="ship-card reveal">
+                <img src="assets/ships/ghost.png" alt="Ghost Ship"
+                    style="filter: drop-shadow(0 0 24px rgba(100,255,230,0.5));">
+                <h3>Ghost</h3>
+                <div class="ship-role">Stealth Assassin</div>
+                <p>Phase through matter, deploy holographic decoys, and capture enemies from the shadows. The prestige
+                    reward.</p>
+                <div class="ship-stats">
+                    <span class="ship-tag pro">Stealth</span>
+                    <span class="ship-tag pro">Mind Ctrl</span>
+                    <span class="ship-tag con">Low HP</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="cta-section">
+        <h2 class="reveal">Ready to Launch?</h2>
+        <p class="reveal">Play instantly in your browser. No downloads, no installs.</p>
+        <a href="https://aliensector.com/" class="btn-primary reveal" style="font-size: 18px; padding: 20px 56px;">▶
+            Play Alien Sector</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>&copy; 2025 Alien Sector &middot; <a href="https://aliensector.com/privacy.html">Privacy Policy</a></p>
+    </footer>
+
+    <!-- ============================================================
+         SCRIPTS
+         ============================================================ -->
+    <script>
+        // ----- ANIMATED STAR FIELD -----
+        (() => {
+            const canvas = document.getElementById('star-canvas');
+            const ctx = canvas.getContext('2d');
+            let w, h;
+            const stars = [];
+            const STAR_COUNT = 200;
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+
+            function createStars() {
+                stars.length = 0;
+                for (let i = 0; i < STAR_COUNT; i++) {
+                    stars.push({
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        r: Math.random() * 1.5 + 0.3,
+                        speed: Math.random() * 0.3 + 0.05,
+                        alpha: Math.random() * 0.6 + 0.2,
+                        phase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            function draw(t) {
+                ctx.clearRect(0, 0, w, h);
+                for (const s of stars) {
+                    s.y += s.speed;
+                    if (s.y > h) { s.y = -2; s.x = Math.random() * w; }
+                    const flicker = 0.6 + 0.4 * Math.sin(t * 0.002 + s.phase);
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(180, 210, 255, ${s.alpha * flicker})`;
+                    ctx.fill();
+                }
+                requestAnimationFrame(draw);
+            }
+
+            resize();
+            createStars();
+            requestAnimationFrame(draw);
+            window.addEventListener('resize', () => { resize(); createStars(); });
+        })();
+
+        // ----- INTERSECTION OBSERVER (reveal on scroll) -----
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    observer.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // ----- NAV BACKGROUND ON SCROLL -----
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 80) {
+                nav.style.background = 'rgba(6, 10, 20, 0.95)';
+                nav.style.borderBottomColor = 'rgba(0, 229, 255, 0.15)';
+            } else {
+                nav.style.background = 'rgba(6, 10, 20, 0.75)';
+                nav.style.borderBottomColor = 'rgba(0, 229, 255, 0.08)';
+            }
+        });
+    </script>
+</body>
+
+</html>
