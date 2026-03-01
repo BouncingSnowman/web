@@ -1,4 +1,4 @@
-import { Game } from './Game.js?v=6000';
+import { Game } from './Game.js?v=6005';
 import { AudioSys, Joystick, Leaderboard, safeSetText } from './Systems.js?v=6000';
 import { CONFIG } from './constants.js?v=6000';
 import { GlobalLeaderboard } from './GlobalLeaderboard.js?v=6000';
@@ -893,7 +893,7 @@ window.addEventListener('load', () => {
                 fireRateMult: 1.0 // 100% blaster
             },
             GHOST: {
-                maxHp: 75,       // 75% health
+                maxHp: 113,      // 113% health
                 speedMult: 1.2,  // 120% speed
                 fireRateMult: 1.0 // 100% blaster
             }
@@ -1057,7 +1057,7 @@ window.addEventListener('load', () => {
 
         // Update ship stats based on new selection
         if (isGhostShip) {
-            game.ship.maxHp = 75;
+            game.ship.maxHp = 113;
             game.ship.speedMult = 1.2;
             game.ship.permanentFireRateMult = 1.0;
         } else if (isWarlockShip) {

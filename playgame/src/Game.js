@@ -1,4 +1,4 @@
-import { Ship } from './Ship.js?v=6004';
+import { Ship } from './Ship.js?v=6005';
 import { Asteroid, Bullet, Particle, Enemy, FloatingText, Debris, Rocket, Powerup } from './Entities.js?v=6004';
 import { Galaxy, Star, Planet, Nebula } from './World.js';
 import { AudioSys, ScreenShake, Joystick, Leaderboard, safeSetText } from './Systems.js?v=6000';

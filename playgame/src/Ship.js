@@ -174,11 +174,11 @@ export class Ship {
         // HERO:    200% health, 75% speed, standard blaster
         // PHOENIX:  50% health, 130% speed, faster blaster 
         // WARLOCK:  100% health, 100% speed, standard blaster
-        // GHOST:    75% health, 120% speed, standard blaster
+        // GHOST:    113% health, 120% speed, standard blaster
         this.speedMult = 1.0;
 
         if (this.isGhostShip) {
-            this.maxHp = 75;
+            this.maxHp = 113;
             this.speedMult = 1.2;
             this.permanentFireRateMult = 1.0;
         }
