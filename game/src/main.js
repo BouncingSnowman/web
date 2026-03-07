@@ -1,6 +1,6 @@
 import { Game } from './Game.js?v=6007';
 import { AudioSys, Joystick, Leaderboard, safeSetText } from './Systems.js?v=6007';
-import { CONFIG } from './constants.js?v=6007';
+import { CONFIG } from './constants.js?v=6008';
 import { GlobalLeaderboard } from './GlobalLeaderboard.js?v=140';
 import { CG } from './crazygames.js?v=6007';
 import { track } from './Telemetry.js?v=6007';
