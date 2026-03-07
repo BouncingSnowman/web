@@ -1,9 +1,9 @@
-import { Game } from './Game.js?v=6005';
-import { AudioSys, Joystick, Leaderboard, safeSetText } from './Systems.js?v=6000';
-import { CONFIG } from './constants.js?v=6000';
-import { GlobalLeaderboard } from './GlobalLeaderboard.js?v=6000';
-import { CG } from './crazygames.js?v=6000';
-import { track } from './Telemetry.js?v=6000';
+import { Game } from './Game.js?v=6010';
+import { AudioSys, Joystick, Leaderboard, safeSetText } from './Systems.js?v=6010';
+import { CONFIG } from './constants.js?v=6010';
+import { GlobalLeaderboard } from './GlobalLeaderboard.js?v=140';
+import { CG } from './crazygames.js?v=6010';
+import { track } from './Telemetry.js?v=6010';
 
 const DIFFICULTY_KEY = 'ASTROCOM_DIFFICULTY';
 const TUTORIAL_DONE_KEY = 'ALIENSECTOR_TUTORIAL_DONE';

@@ -1,11 +1,11 @@
-import { Ship } from './Ship.js?v=6005';
-import { Asteroid, Bullet, Particle, Enemy, FloatingText, Debris, Rocket, Powerup } from './Entities.js?v=6004';
-import { Galaxy, Star, Planet, Nebula } from './World.js';
-import { AudioSys, ScreenShake, Joystick, Leaderboard, safeSetText } from './Systems.js?v=6000';
-import { CONFIG } from './constants.js?v=6000';
-import { GlobalLeaderboard } from './GlobalLeaderboard.js?v=6000';
-import { CG } from './crazygames.js?v=6000';
-import { track } from './Telemetry.js?v=6000';
+import { Ship } from './Ship.js?v=6010';
+import { Asteroid, Bullet, Particle, Enemy, FloatingText, Debris, Rocket, Powerup } from './Entities.js?v=6010';
+import { Galaxy, Star, Planet, Nebula } from './World.js?v=6010';
+import { AudioSys, ScreenShake, Joystick, Leaderboard, safeSetText } from './Systems.js?v=6010';
+import { CONFIG } from './constants.js?v=6010';
+import { GlobalLeaderboard } from './GlobalLeaderboard.js?v=140';
+import { CG } from './crazygames.js?v=6010';
+import { track } from './Telemetry.js?v=6010';
 
 export class Game {
     constructor(canvas) {

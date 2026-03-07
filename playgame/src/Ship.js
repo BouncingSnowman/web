@@ -1,10 +1,10 @@
-import { CONFIG } from './constants.js?v=6000';
+import { CONFIG } from './constants.js?v=6010';
 // NOTE: Use the same cache-busted Entities module URL as Game.js to avoid
 // browsers mixing cached module variants (e.g., './Entities.js' vs './Entities.js?v=...').
-import { Bullet, Particle, Debris, Powerup, randomPowerType } from './Entities.js?v=6004';
-import { AudioSys, Joystick, ScreenShake } from './Systems.js?v=6000';
-import { CG } from './crazygames.js?v=6000';
-import { track } from './Telemetry.js?v=6000';
+import { Bullet, Particle, Debris, Powerup, randomPowerType } from './Entities.js?v=6010';
+import { AudioSys, Joystick, ScreenShake } from './Systems.js?v=6010';
+import { CG } from './crazygames.js?v=6010';
+import { track } from './Telemetry.js?v=6010';
 
 // Player ship sprite (points UP in the PNG; we rotate it +90° when drawing)
 const HERO_SHIP_IMG = new Image();
@@ -180,6 +180,7 @@ export class Ship {
         if (this.isGhostShip) {
             this.maxHp = 113;
             this.speedMult = 1.2;
+            // Ghost keeps its original blaster timing, but each shot hits 50% harder.
             this.permanentFireRateMult = 1.0;
         }
         else if (this.isWarlockShip) {
@@ -297,11 +298,12 @@ export class Ship {
         // -----------------
 
         const forcedPlayerBulletColor = this.isGhostShip
-            ? '#0044ff'
-            : (this.isWinnerShip
+            ? '#ff0000'
+            : ((this.isWinnerShip)
                 ? '#ffff00'
                 : (this.isWarlockShip ? '#0088ff' : null));
-        const bulletScale = this.isGhostShip ? 1.2 : 1.0;
+        const bulletScale = 1.0;
+        const damageMult = this.isGhostShip ? 1.5 : 1.0;
 
         // Single cannon
         if (this.weaponLevel === 0) {
@@ -311,7 +313,7 @@ export class Ship {
                     this.y + Math.sin(this.angle) * CONFIG.SHIP_SIZE,
                     this.angle,
                     forcedPlayerBulletColor || (this.fireRateMult < 1.0 ? '#ffff00' : '#00ffff'),
-                    1.0,
+                    1.0 * damageMult,
                     false,
                     bulletScale
                 )
@@ -325,7 +327,7 @@ export class Ship {
             : (this.weaponLevel >= 2 || this.fireRateMult < 1.0
                 ? '#ffff00'
                 : '#39ff14');
-        const damage = this.weaponLevel >= 2 ? 1.25 : 1.0;
+        let damage = (this.weaponLevel >= 2 ? 1.25 : 1.0) * damageMult;
         const offset = 10;
 
         // Left gun

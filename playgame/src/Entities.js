@@ -1,5 +1,5 @@
-import { CONFIG, BULLET_COLORS } from './constants.js?v=6000';
-import { AudioSys, ScreenShake } from './Systems.js?v=6000';
+import { CONFIG, BULLET_COLORS } from './constants.js?v=6010';
+import { AudioSys, ScreenShake } from './Systems.js?v=6010';
 
 // ----------------------------------------------------------------------------------------------------
 // SPRITES
