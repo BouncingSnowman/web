@@ -1,10 +1,10 @@
-import { CONFIG } from './constants.js?v=6008';
+import { CONFIG } from './constants.js?v=6009';
 // NOTE: Use the same cache-busted Entities module URL as Game.js to avoid
 // browsers mixing cached module variants (e.g., './Entities.js' vs './Entities.js?v=...').
-import { Bullet, Particle, Debris, Powerup, randomPowerType } from './Entities.js?v=6008';
-import { AudioSys, Joystick, ScreenShake } from './Systems.js?v=6008';
-import { CG } from './crazygames.js?v=6008';
-import { track } from './Telemetry.js?v=6008';
+import { Bullet, Particle, Debris, Powerup, randomPowerType } from './Entities.js?v=6009';
+import { AudioSys, Joystick, ScreenShake } from './Systems.js?v=6009';
+import { CG } from './crazygames.js?v=6009';
+import { track } from './Telemetry.js?v=6009';
 
 // Player ship sprite (points UP in the PNG; we rotate it +90° when drawing)
 const HERO_SHIP_IMG = new Image();
